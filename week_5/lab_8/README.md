@@ -1,0 +1,1 @@
+I finished/improved my code from lab_5 as i said i would. I picked this because I planned to do this anyway to help me keep track of my bUdget for something. I got rid of the code keeping track of the months as I didn't think it necessary but I might add it back later.
