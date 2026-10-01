@@ -19,6 +19,29 @@ def add_expense(expense_amount, expense_category, expense_date, expense_note):
         
 
 
+def remove_expense(expense_index):
+    with open(_PATHWAY_EXPENSES_JSON, "r") as file:
+        data = json.load(file)
+    if 0 <= expense_index < len(data):
+        user_confirmation = input(f"Are you sure you want to remove expense {data[expense_index]}? (yes/no): ")
+        if user_confirmation.lower() == "yes":
+            removed_expense = data.pop(expense_index)
+            with open(_PATHWAY_EXPENSES_JSON, "w") as file:
+                json.dump(data, file)
+            with open(_PATHWAY_BUDGETS_JSON, "r") as file:
+                budgets = json.load(file)
+                for budget in budgets:
+                    if budget['category'] == removed_expense['category']:
+                        budget['current_budget'] = float(budget['current_budget']) + float(removed_expense['amount'])
+                with open(_PATHWAY_BUDGETS_JSON, "w") as file:
+                    json.dump(budgets, file)
+            print(f"Removed expense: {removed_expense}")
+        else:
+            print("Expense removal cancelled")
+    else:
+        print("Invalid expense index")
+
+
 def view_all_expenses():
     with open(_PATHWAY_EXPENSES_JSON, "r") as file:
         data = json.load(file)
