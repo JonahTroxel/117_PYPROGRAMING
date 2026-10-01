@@ -1,9 +1,22 @@
-months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
+months = [
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
+]
 current_month_index = 0
 budget = 0
 month_budget = 25
 while True:
-    user_input = input()
+    user_input = input("Something to enter")
     if user_input == "next month":
         current_month_index = (current_month_index + 1) % 12
         budget += month_budget
@@ -12,4 +25,3 @@ while True:
     else:
         budget -= float(user_input)
         print("Budget:", budget)
-        
