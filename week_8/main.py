@@ -1,6 +1,13 @@
 _PATHWAY_EXPENSES_JSON = "week_8/expenses.json"
 _PATHWAY_BUDGETS_JSON = "week_8/budgets.json"
+_SLEEP_AMOUNT = 5
 import json
+import time
+
+
+
+def sleep_for_a_while():
+    time.sleep(_SLEEP_AMOUNT)
 
 def add_expense(expense_amount, expense_category, expense_date, expense_note):
     with open(_PATHWAY_EXPENSES_JSON, "r") as file:
@@ -18,6 +25,26 @@ def add_expense(expense_amount, expense_category, expense_date, expense_note):
         json.dump(budgets, file)
         
 
+def edit_expense(expense_index):
+    sleep_for_a_while()
+    with open(_PATHWAY_EXPENSES_JSON, "r") as file:
+        data = json.load(file)
+    if 0 <= expense_index < len(data):
+        expense = data[expense_index]
+        print(f"Editing expense: {expense}")
+        new_amount = input(f"Enter new amount (current: {expense['amount']}): ")
+        new_category = input(f"Enter new category (current: {expense['category']}): ")
+        new_date = input(f"Enter new date (current: {expense['date']}): ")
+        new_note = input(f"Enter new note (current: {expense['note']}): ")
+        expense['amount'] = new_amount
+        expense['category'] = new_category
+        expense['date'] = new_date
+        expense['note'] = new_note
+        with open(_PATHWAY_EXPENSES_JSON, "w") as file:
+            json.dump(data, file)
+        print(f"Updated expense: {expense}")
+    else:
+        print("Invalid expense index")
 
 def remove_expense(expense_index):
     with open(_PATHWAY_EXPENSES_JSON, "r") as file:
@@ -41,6 +68,19 @@ def remove_expense(expense_index):
     else:
         print("Invalid expense index")
 
+
+def find_expense():
+    expense_date = input("Enter the date of the expense (YYYY-MM-DD): ")
+    expense_category = input("Enter the category of the expense: ")
+    expense_amount = input("Enter the amount of the expense: ")
+    with open(_PATHWAY_EXPENSES_JSON, "r") as file:
+        data = json.load(file)
+    expense_index = -1
+    for i, expense in enumerate(data):
+        if expense['date'] == expense_date and expense['category'] == expense_category and expense['amount'] == expense_amount:
+            expense_index = i
+            break
+    return expense_index
 
 def view_all_expenses():
     with open(_PATHWAY_EXPENSES_JSON, "r") as file:
@@ -113,12 +153,13 @@ while True:
     print("Welcome to the expense tracker")
     print("1. Add expense")
     print("2. View expenses")
-    print("3. View all Categories")
-    print("4. move to next month")
-    print("5. View all budgets")
-    print("6. change/add a budget")
-    print("7. remove an expense")
-    print("8. Exit")
+    print("3. edit an expense")
+    print("4. View all Categories")
+    print("5. move to next month")
+    print("6. View all budgets")
+    print("7. change/add a budget")
+    print("8. remove an expense")
+    print("9. Exit")
     
     user_choice = input("Enter your choice: ")
     
@@ -145,24 +186,30 @@ while True:
                 view_expenses_by_date(date)
         else:
             print("Invalid choice, please try again.")
-            
-            
+    
+    
     elif user_choice == "3":
+        print("Edit an expense selected")
+        expense_index = find_expense()
+        edit_expense(expense_index)
+            
+            
+    elif user_choice == "4":
         print("View all Categories selected")
         view_all_categories()
         
         
-    elif user_choice == "4":
+    elif user_choice == "5":
         print("Move to next month selected")
         next_month()
         
         
-    elif user_choice == "5":
+    elif user_choice == "6":
         print("View all budgets selected")
         view_all_budgets()
         
         
-    elif user_choice == "6":
+    elif user_choice == "7":
         user_input = input("Do you want to 'add' or 'change' a budget? ")
         if user_input.lower() == "add":
             budget_category = input("Enter the category for the budget: ")
@@ -183,21 +230,18 @@ while True:
             print("Invalid choice, please try again.")
         
 
-    elif user_choice == "7":
+    elif user_choice == "8":
         while True:
-            expense_date = input("Enter the date of the expense to remove (YYYY-MM-DD): ")
-            expense_category = input("Enter the category of the expense to remove: ")
-            expense_amount = input("Enter the amount of the expense to remove: ")
+            expense_index = find_expense()
+            if expense_index == -1:
+                print("Expense not found.")
+                break
             with open(_PATHWAY_EXPENSES_JSON, "r") as file:
                 data = json.load(file)
-            data = [expense for expense in data if not (expense['date'] == expense_date and expense['category'] == expense_category and expense['amount'] == expense_amount)]
-            print(str(data) + " will be removed if confirmed.")
+            print({data[expense_index]})
             user_input = input("Are you sure you want to remove this expense? (yes/no): ")
             if user_input.lower() == "yes":
-                with open(_PATHWAY_EXPENSES_JSON, "w") as file:
-                    json.dump(data, file)
-                print("Expense removed")
-                break
+                remove_expense(expense_index)
             elif user_input.lower() == "no":
                 exit_or_try_again = input("Expense not removed. Try again. Press Enter to continue or type 'exit' to quit: ")
                 if exit_or_try_again.lower() == "exit":
@@ -208,9 +252,10 @@ while True:
                     break
 
 
-    elif user_choice == "8":
+    elif user_choice == "9":
         print("Exiting program")
         exit()
     else:
         print("Invalid choice, please try again.")
+    sleep_for_a_while()
     
