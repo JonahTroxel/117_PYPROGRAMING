@@ -1,5 +1,5 @@
-_PATHWAY_EXPENSES_JSON = "week_8/expenses.json"
-_PATHWAY_BUDGETS_JSON = "week_8/budgets.json"
+_PATHWAY_EXPENSES_JSON = "C:/Programming-2026-27/PYPROGRAM-2026-27/week_8/expenses.json"
+_PATHWAY_BUDGETS_JSON = "C:/Programming-2026-27/PYPROGRAM-2026-27/week_8/budgets.json"
 _SLEEP_AMOUNT = 5
 import json
 import time
@@ -207,7 +207,7 @@ while True:
                     break
                 with open(_PATHWAY_EXPENSES_JSON, "r") as file:
                     data = json.load(file)
-                print({data[expense_index]})
+                print(json.dumps(data[expense_index], indent=4))
                 user_input = input("Are you sure you want to remove this expense? (yes/no): ")
                 if user_input.lower() == "yes":
                     remove_expense(expense_index)
