@@ -251,7 +251,8 @@ while True:
         print("Welcome to the Budgets section")
         print("1. View all budgets")
         print("2. Add/change a budget")
-        print("3. Back to main menu")
+        print("3. go to next month")
+        print("4. Back to main menu")
         user_input = input("Enter your choice: ")
         if user_input == "1":
             view_all_budgets()
@@ -279,6 +280,10 @@ while True:
             
             
         elif user_input == "3":
+            next_month()
+            
+            
+        elif user_input == "4":
             continue
         else:
             print("Invalid choice, please try again.")
