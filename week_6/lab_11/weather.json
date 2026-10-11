@@ -1,0 +1,14 @@
+[
+    {
+        "Location": "Boscobel",
+        "Weather": "Sunny"
+    },
+    {
+        "Location": "Madison",
+        "Weather": "Cloudy"
+    },
+    {
+        "Location": "Milwaukee",
+        "Weather": "Rainy"
+    }
+]
