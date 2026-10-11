@@ -12,7 +12,7 @@ average = total / len(scores)
 
 print("Average score:", average)
 
-if average >= 60
+if average >= 60:
     print("Student passed!")
 else:
     print("Student failed!")
