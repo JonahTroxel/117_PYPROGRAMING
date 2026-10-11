@@ -6,7 +6,7 @@ scores = [80, 90, 70]
 total = 0
 
 for score in scores:
-    total = score
+    total += score
 
 average = total / len(scores)
 
