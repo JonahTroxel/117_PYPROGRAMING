@@ -1,8 +1,1 @@
-[
-    {
-        "category": "gaming", "monthly_amount": "30", "current_budget": 120.18
-    },
-    {
-        "category": "games", "monthly_amount": "25", "current_budget": 17.5
-    }
-]
+[{"category": "gaming", "monthly_amount": "30", "current_budget": 120.18}, {"category": "games", "monthly_amount": "25", "current_budget": 17.5}]

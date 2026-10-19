@@ -6,7 +6,7 @@ _SHOW_AMOUNT = 5
 import json
 import time
 
-def expenses():
+def expenses_section():
     print("Welcome to the Expenses section")
     print("1. Add expense")
     print("2. View expenses")
@@ -76,28 +76,12 @@ def expenses():
         print("Invalid choice, please try again.")
 
 
-def categories():
-    print("Welcome to the Categories section")
-    print("1. View all categories")
-    print("2. Back to main menu")
-    user_input = input("Enter your choice: ")
-    if user_input == "1":
-        view_all_categories()
-    
-    elif user_input == "2":
-        return
-    
-    else:
-        print("Invalid choice, please try again.")
-
-def sleep_for_a_while():
-    time.sleep(_SLEEP_AMOUNT)
-
 def add_expense():
     expense_amount = input("Enter expense amount: ")
-    expense_category = input("Enter expense category: ")
+    expense_category = check_expense_category()
     expense_sub_category = input("Enter expense sub-category (optional): ")
-    expense_date = input("Enter expense date (YYYY-MM-DD): ")
+    year, month, day = get_dates()
+    expense_date = f"{year}-{month:02d}-{day:02d}"
     expense_note = input("Enter expense note (optional): ")
     #add_expense(expense_amount, expense_category, expense_date, expense_note)
     print(f"Added expense of {expense_amount} in category {expense_category}")
@@ -116,12 +100,51 @@ def add_expense():
         json.dump(budgets, file)
 
 
+# def check_expense_amount(expense_amount):
+    # try:
+    #     amount = float(expense_amount)
+    #     if amount < 0:
+    #         print("Expense amount cannot be negative.")
+    #         return False
+    #     return True
+    # except ValueError:
+    #     print("Invalid expense amount.")
+    #     return False
+
+
+def check_expense_category():
+    print("Please enter the category.")
+    while True:
+        category = input()
+        result = find_category(category)
+        if result == None:
+            print("This will create a new category.")
+            print("Is this correct? (yes/no): ")
+            confirmation = input()
+            if confirmation.lower() == "yes" or confirmation.lower() == "y":
+                return category
+            elif confirmation.lower() == "no" or confirmation.lower() == "n":
+                continue
+        return category
+
+
+
+def find_category(category):
+    with open(_PATHWAY_EXPENSES_JSON, "r") as file:
+        data = json.load(file)
+    for expense in data:
+        if expense['category'] == category:
+            return expense['category'].index(category)
+    return None
+
+
 def print_expense(expense_index):
     with open(_PATHWAY_EXPENSES_JSON, "r") as file:
         data = json.load(file)
     if 0 <= expense_index < len(data):
         expense = data[expense_index]
         print(f"Amount: {expense['amount']}, Category: {expense['category']}, Sub-category: {expense['sub_category']}, Date: {expense['date']}, Note: {expense['note']}")
+
 
 def view_expense():
     user_input = input("Do you want to view all expenses? (yes/no): ")
@@ -350,6 +373,21 @@ def view_expenses_by_date(date):
             print(f"Amount: {expense['amount']}, Category: {expense['category']}, Sub-category: {expense['sub_category']}, Date: {expense['date']}, Note: {expense['note']}")
 
 
+def categories_section():
+    print("Welcome to the Categories section")
+    print("1. View all categories")
+    print("2. Back to main menu")
+    user_input = input("Enter your choice: ")
+    if user_input == "1":
+        view_all_categories()
+    
+    elif user_input == "2":
+        return
+    
+    else:
+        print("Invalid choice, please try again.")
+
+
 def view_all_categories():
     with open(_PATHWAY_EXPENSES_JSON, "r") as file:
         data = json.load(file)
@@ -365,6 +403,46 @@ def check_category_exists(category):
         if expense['category'] == category:
             return True
     return False
+
+
+def budgets_section():
+    print("Welcome to the Budgets section")
+    print("1. View all budgets")
+    print("2. Add/change a budget")
+    print("3. go to next month")
+    print("4. Back to main menu")
+    user_input = input("Enter your choice: ")
+    if user_input == "1":
+        view_all_budgets()
+
+    elif user_input == "2":
+        user_input = input("Do you want to 'add' or 'change' a budget? ")
+        if user_input.lower() == "add":
+            budget_category = input("Enter the category for the budget: ")
+            budget_monthly_amount = input("Enter the monthly budget amount: ")
+            add_budget(budget_category, budget_monthly_amount)
+            print(f"Added budget for category {budget_category} with monthly amount {budget_monthly_amount}")
+        elif user_input.lower() == "change":
+            budget_category = input("Enter the category for the budget: ")
+            budget_monthly_amount = input("Enter the new monthly budget amount: ")
+            user_input_now = input("Do you want to add the difference to the current budget? (yes/no): ")
+            if user_input_now.lower() == "yes":
+                change_budget(budget_category, budget_monthly_amount, add_difference=True)
+            elif user_input_now.lower() == "no":
+                change_budget(budget_category, budget_monthly_amount, add_difference=False)
+            else:
+                print("Invalid choice, please try again.")
+        else:
+            print("Invalid choice, please try again.")
+            
+            
+    elif user_input == "3":
+        next_month()
+        
+    elif user_input == "4":
+        return
+    else:
+        print("Invalid choice, please try again.")
 
 
 def add_budget(budget_category, budget_monthly_amount):
@@ -403,161 +481,183 @@ def view_all_budgets():
         print(f"Category: {budget['category']}, Monthly Amount: {budget['monthly_amount']}, Current Budget: {budget['current_budget']}")
 
 
-while True:
-    print("Welcome to the finance tracker")
-    print("1. Expenses")
-    print("2. Categories")
-    print("3. Budgets")
-    print("4. Exit")
-    user_choice = input("Enter your choice: ")
-    
-    
-    if user_choice == "1":
-        expenses()
-        # print("Welcome to the Expenses section")
-        # print("1. Add expense")
-        # print("2. View expenses")
-        # print("3. Edit an expense")
-        # print("4. Remove an expense")
-        # print("5. Back to main menu")
-        # user_choice = input("Enter your choice: ")
-        # if user_choice == "1":
-        #     expense_amount = input("Enter expense amount: ")
-        #     expense_category = input("Enter expense category: ")
-        #     expense_date = input("Enter expense date (YYYY-MM-DD): ")
-        #     expense_note = input("Enter expense note (optional): ")
-        #     add_expense(expense_amount, expense_category, expense_date, expense_note)
-        #     print(f"Added expense of {expense_amount} in category {expense_category}")
+def sleep_for_a_while():
+    time.sleep(_SLEEP_AMOUNT)
 
 
-        # elif user_choice == "2":
-        #     user_input = input("Do you want to view all expenses? (yes/no): ")
-        #     if user_input.lower() == "yes":
-        #         view_all_expenses()
-        #     elif user_input.lower() == "no":
-        #         category_or_date = input("Do you want to view by category or date? (category/date): ")
-        #         if category_or_date.lower() == "category":
-        #             category = input("Enter category: ")
-        #             view_expenses_by_category(category)
-        #         elif category_or_date.lower() == "date":
-        #             date = input("Enter date (YYYY-MM-DD): ")
-        #             view_expenses_by_date(date)
-        #         else:
-        #             print("Invalid choice, please try again.")
-        #     else:
-        #         print("Invalid choice, please try again.")
+def get_dates():
+    print("Enter the date: YYYY-MM-DD")
+    while True:
+        date_input = input()
+        try:
+            year = int(date_input.split("-")[0])
+            month = int(date_input.split("-")[1])
+            day = int(date_input.split("-")[2])
+            return year, month, day
+        except ValueError:
+            print("Invalid date format. Please enter the date in YYYY-MM-DD format.")
+            print("Type exit to quit.")
+        if date_input.lower() == "exit":
+            return None, None, None
 
-
-        # elif user_choice == "3":
-        #     print("Edit an expense selected")
-        #     expense_index = find_expense()
-        #     edit_expense(expense_index)
-
-
-        # elif user_choice == "4":
-        #     while True:
-        #         expense_index = find_expense()
-        #         if expense_index == -1:
-        #             print("Expense not found.")
-        #             break
-        #         with open(_PATHWAY_EXPENSES_JSON, "r") as file:
-        #             data = json.load(file)
-        #         print(json.dumps(data[expense_index], indent=4))
-        #         user_input = input("Are you sure you want to remove this expense? (yes/no): ")
-        #         if user_input.lower() == "yes":
-        #             remove_expense(expense_index)
-        #         elif user_input.lower() == "no":
-        #             exit_or_try_again = input("Expense not removed. Try again. Press Enter to continue or type 'exit' to quit: ")
-        #             if exit_or_try_again.lower() == "exit":
-        #                 break
-        #         else:
-        #             exit_or_try_again = input("Expense not removed. Try again. Press Enter to continue or type 'exit' to quit: ")
-        #             if exit_or_try_again.lower() == "exit":
-        #                 break
-
-
-        # elif user_choice == "5":
-        #     continue
-        # else:
-        #     print("Invalid choice, please try again.")
-
-
-
-
-
-    elif user_choice == "2":
-        categories()
-        # print("Welcome to the Categories section")
-        # print("1. View all categories")
-        # print("2. Back to main menu")
-        # user_input = input("Enter your choice: ")
-        # if user_input == "1":
-        #     view_all_categories()
-
-        # elif user_input == "2":
-        #     continue
-
-        # else:
-        #     print("Invalid choice, please try again.")
-
-
-
-
-    elif user_choice == "3":
-        print("Welcome to the Budgets section")
-        print("1. View all budgets")
-        print("2. Add/change a budget")
-        print("3. go to next month")
-        print("4. Back to main menu")
-        user_input = input("Enter your choice: ")
-        if user_input == "1":
-            view_all_budgets()
+def main():
+    while True:
+        print("Welcome to the finance tracker")
+        print("1. Expenses")
+        print("2. Categories")
+        print("3. Budgets")
+        print("4. Exit")
+        user_choice = input("Enter your choice: ")
         
         
-        elif user_input == "2":
-            user_input = input("Do you want to 'add' or 'change' a budget? ")
-            if user_input.lower() == "add":
-                budget_category = input("Enter the category for the budget: ")
-                budget_monthly_amount = input("Enter the monthly budget amount: ")
-                add_budget(budget_category, budget_monthly_amount)
-                print(f"Added budget for category {budget_category} with monthly amount {budget_monthly_amount}")
-            elif user_input.lower() == "change":
-                budget_category = input("Enter the category for the budget: ")
-                budget_monthly_amount = input("Enter the new monthly budget amount: ")
-                user_input_now = input("Do you want to add the difference to the current budget? (yes/no): ")
-                if user_input_now.lower() == "yes":
-                    change_budget(budget_category, budget_monthly_amount, add_difference=True)
-                elif user_input_now.lower() == "no":
-                    change_budget(budget_category, budget_monthly_amount, add_difference=False)
-                else:
-                    print("Invalid choice, please try again.")
-            else:
-                print("Invalid choice, please try again.")
+        if user_choice == "1":
+            expenses_section()
+            # print("Welcome to the Expenses section")
+            # print("1. Add expense")
+            # print("2. View expenses")
+            # print("3. Edit an expense")
+            # print("4. Remove an expense")
+            # print("5. Back to main menu")
+            # user_choice = input("Enter your choice: ")
+            # if user_choice == "1":
+            #     expense_amount = input("Enter expense amount: ")
+            #     expense_category = input("Enter expense category: ")
+            #     expense_date = input("Enter expense date (YYYY-MM-DD): ")
+            #     expense_note = input("Enter expense note (optional): ")
+            #     add_expense(expense_amount, expense_category, expense_date, expense_note)
+            #     print(f"Added expense of {expense_amount} in category {expense_category}")
+
+
+            # elif user_choice == "2":
+            #     user_input = input("Do you want to view all expenses? (yes/no): ")
+            #     if user_input.lower() == "yes":
+            #         view_all_expenses()
+            #     elif user_input.lower() == "no":
+            #         category_or_date = input("Do you want to view by category or date? (category/date): ")
+            #         if category_or_date.lower() == "category":
+            #             category = input("Enter category: ")
+            #             view_expenses_by_category(category)
+            #         elif category_or_date.lower() == "date":
+            #             date = input("Enter date (YYYY-MM-DD): ")
+            #             view_expenses_by_date(date)
+            #         else:
+            #             print("Invalid choice, please try again.")
+            #     else:
+            #         print("Invalid choice, please try again.")
+
+
+            # elif user_choice == "3":
+            #     print("Edit an expense selected")
+            #     expense_index = find_expense()
+            #     edit_expense(expense_index)
+
+
+            # elif user_choice == "4":
+            #     while True:
+            #         expense_index = find_expense()
+            #         if expense_index == -1:
+            #             print("Expense not found.")
+            #             break
+            #         with open(_PATHWAY_EXPENSES_JSON, "r") as file:
+            #             data = json.load(file)
+            #         print(json.dumps(data[expense_index], indent=4))
+            #         user_input = input("Are you sure you want to remove this expense? (yes/no): ")
+            #         if user_input.lower() == "yes":
+            #             remove_expense(expense_index)
+            #         elif user_input.lower() == "no":
+            #             exit_or_try_again = input("Expense not removed. Try again. Press Enter to continue or type 'exit' to quit: ")
+            #             if exit_or_try_again.lower() == "exit":
+            #                 break
+            #         else:
+            #             exit_or_try_again = input("Expense not removed. Try again. Press Enter to continue or type 'exit' to quit: ")
+            #             if exit_or_try_again.lower() == "exit":
+            #                 break
+
+
+            # elif user_choice == "5":
+            #     continue
+            # else:
+            #     print("Invalid choice, please try again.")
+
+
+
+
+
+        elif user_choice == "2":
+            categories_section()
+            # print("Welcome to the Categories section")
+            # print("1. View all categories")
+            # print("2. Back to main menu")
+            # user_input = input("Enter your choice: ")
+            # if user_input == "1":
+            #     view_all_categories()
+
+            # elif user_input == "2":
+            #     continue
+
+            # else:
+            #     print("Invalid choice, please try again.")
+
+
+
+
+        elif user_choice == "3":
+            budgets_section()
+            # print("Welcome to the Budgets section")
+            # print("1. View all budgets")
+            # print("2. Add/change a budget")
+            # print("3. go to next month")
+            # print("4. Back to main menu")
+            # user_input = input("Enter your choice: ")
+            # if user_input == "1":
+            #     view_all_budgets()
             
             
-        elif user_input == "3":
-            next_month()
-            
-            
-        elif user_input == "4":
-            continue
+            # elif user_input == "2":
+            #     user_input = input("Do you want to 'add' or 'change' a budget? ")
+            #     if user_input.lower() == "add":
+            #         budget_category = input("Enter the category for the budget: ")
+            #         budget_monthly_amount = input("Enter the monthly budget amount: ")
+            #         add_budget(budget_category, budget_monthly_amount)
+            #         print(f"Added budget for category {budget_category} with monthly amount {budget_monthly_amount}")
+            #     elif user_input.lower() == "change":
+            #         budget_category = input("Enter the category for the budget: ")
+            #         budget_monthly_amount = input("Enter the new monthly budget amount: ")
+            #         user_input_now = input("Do you want to add the difference to the current budget? (yes/no): ")
+            #         if user_input_now.lower() == "yes":
+            #             change_budget(budget_category, budget_monthly_amount, add_difference=True)
+            #         elif user_input_now.lower() == "no":
+            #             change_budget(budget_category, budget_monthly_amount, add_difference=False)
+            #         else:
+            #             print("Invalid choice, please try again.")
+            #     else:
+            #         print("Invalid choice, please try again.")
+                
+                
+            # elif user_input == "3":
+            #     next_month()
+                
+                
+            # elif user_input == "4":
+            #     continue
+            # else:
+            #     print("Invalid choice, please try again.")
+
+
+
+        elif user_choice == "4":
+            print("Exiting the finance tracker")
+            break
+
+
+
+
         else:
             print("Invalid choice, please try again.")
 
 
 
-    elif user_choice == "4":
-        print("Exiting the finance tracker")
-        break
-
-
-
-
-    else:
-        print("Invalid choice, please try again.")
-
-
-
-
+if __name__ == "__main__":
+    main()
 
 

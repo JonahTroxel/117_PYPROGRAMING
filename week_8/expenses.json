@@ -1,2 +1,9 @@
 [
+    {
+        "amount": "50", 
+        "category": "test", 
+        "sub_category": "", 
+        "date": "2026-10-11", 
+        "note": "fart"
+    }
 ]
