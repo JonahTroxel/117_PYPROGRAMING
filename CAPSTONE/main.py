@@ -1,11 +1,16 @@
-import json
-import time
-import datetime
-
 _PATHWAY_EXPENSES_JSON = "expenses.json"
 _PATHWAY_BUDGETS_JSON = "budgets.json"
 _PATHWAY_CATEGORIES_JSON = "categories.json"
 _PATHWAY_INTERNAL_DATA_JSON = "internal_data.json"
+import json
+import time
+import datetime
+
+from expenses import _EXPENSES
+from budgets import _BUDGETS
+from categories import _CATEGORIES
+from internal_data import _INTERNAL_DATA
+
 _SLEEP_AMOUNT = 5
 _SHOW_AMOUNT = 5
 with open(_PATHWAY_INTERNAL_DATA_JSON, "r") as file:
@@ -109,8 +114,7 @@ def add_expense():
         categories[expense_category]["total_expenses"] += 1
         with open(_PATHWAY_CATEGORIES_JSON, "w") as file:
             json.dump(categories, file)
-    with open(_PATHWAY_EXPENSES_JSON, "r") as file:
-        data = json.load(file)
+    data = _EXPENSES
     with open(_PATHWAY_EXPENSES_JSON, "w") as file:
         data[str(len(data) + 1).zfill(9)] = {
             "id": str(len(data) + 1).zfill(9),
@@ -169,8 +173,7 @@ def find_category(category):
 
 
 def print_expense(expense_index):
-    with open(_PATHWAY_EXPENSES_JSON, "r") as file:
-        data = json.load(file)
+    data = list(_EXPENSES.values())
     if 0 <= expense_index < len(data):
         expense = data[expense_index]
         print(f"Amount: {expense['amount']}, Category: {expense['category']}, Sub-category: {expense['sub_category']}, Date: {expense['date']}, Note: {expense['note']}")
@@ -198,8 +201,7 @@ def edit_expense():
     expense_index = find_expense()
     #edit_expense(expense_index)
     sleep_for_a_while()
-    with open(_PATHWAY_EXPENSES_JSON, "r") as file:
-        data = json.load(file)
+    data = list(_EXPENSES.values())
     if 0 <= expense_index < len(data):
         expense = data[expense_index]
         print(f"Editing expense: {expense}")
@@ -213,8 +215,8 @@ def edit_expense():
         expense['sub_category'] = new_sub_category
         expense['date'] = new_date
         expense['note'] = new_note
-        with open(_PATHWAY_EXPENSES_JSON, "w") as file:
-            json.dump(data, file)
+        for i, expense in enumerate(data):
+            _EXPENSES[str(i+1)] = expense
         print(f"Updated expense: {expense}")
     else:
         print("Invalid expense index")
@@ -225,19 +227,16 @@ def remove_expense():
         if expense_index == -1:
             print("Expense not found.")
             break
-        with open(_PATHWAY_EXPENSES_JSON, "r") as file:
-            data = json.load(file)
+        data = list(_EXPENSES.values())
         print_expense(expense_index)
         user_input = input("Are you sure you want to remove this expense? (yes/no): ")
         if user_input.lower() == "yes":
-            with open(_PATHWAY_EXPENSES_JSON, "r") as file:
-                data = json.load(file)
+            data = list(_EXPENSES.values())
             if 0 <= expense_index < len(data):
                 # user_confirmation = input(f"Are you sure you want to remove expense {data[expense_index]}? (yes/no): ")
                 # if user_confirmation.lower() == "yes":
                 removed_expense = data.pop(expense_index)
-                with open(_PATHWAY_EXPENSES_JSON, "w") as file:
-                    json.dump(data, file)
+                _EXPENSES = {str(i+1): expense for i, expense in enumerate(data)}
                 with open(_PATHWAY_BUDGETS_JSON, "r") as file:
                     budgets = json.load(file)
                     for budget in budgets:
@@ -261,14 +260,12 @@ def remove_expense():
             exit_or_try_again = input("Expense not removed. Try again. Press Enter to continue or type 'exit' to quit: ")
             if exit_or_try_again.lower() == "exit":
                 break
-    with open(_PATHWAY_EXPENSES_JSON, "r") as file:
-        data = json.load(file)
+    data = list(_EXPENSES.values())
     if 0 <= expense_index < len(data):
         user_confirmation = input(f"Are you sure you want to remove expense {data[expense_index]}? (yes/no): ")
         if user_confirmation.lower() == "yes":
             removed_expense = data.pop(expense_index)
-            with open(_PATHWAY_EXPENSES_JSON, "w") as file:
-                json.dump(data, file)
+            _EXPENSES = {str(i+1): expense for i, expense in enumerate(data)}
             with open(_PATHWAY_BUDGETS_JSON, "r") as file:
                 budgets = json.load(file)
                 for budget in budgets:
@@ -291,8 +288,7 @@ def find_expense():
         return str(int(expense_id) + 1)
     
     expense_category = input("Enter the category of the expense: ")
-    with open(_PATHWAY_EXPENSES_JSON, "r") as file:
-        data = json.load(file)
+    data = list(_EXPENSES.values())
     for i, expense in enumerate(data):
         if expense['category'] == expense_category:
             possible_expenses.append(expense)
@@ -324,7 +320,7 @@ def find_expense():
     elif len(possible_expenses) <= _SHOW_AMOUNT:
         print("Possible expenses:") 
         for expense in possible_expenses:
-            print_expense(expense_index)   
+            print_expense(data.index(expense))
     expense_date = input("Enter the date of the expense (YYYY-MM-DD): ")
     expenses = possible_expenses
     possible_expenses = []
@@ -385,23 +381,20 @@ def find_expense():
     # return expense_index
 
 def view_all_expenses():
-    with open(_PATHWAY_EXPENSES_JSON, "r") as file:
-        data = json.load(file)
+    data = list(_EXPENSES.values())
     for expense in data:
         print(f"Amount: {expense['amount']}, Category: {expense['category']}, Sub-category: {expense['sub_category']}, Date: {expense['date']}, Note: {expense['note']}")
 
 
 def view_expenses_by_category(category):
-    with open(_PATHWAY_EXPENSES_JSON, "r") as file:
-        data = json.load(file)
+    data = list(_EXPENSES.values())
     for expense in data:
         if expense['category'] == category:
             print(f"Amount: {expense['amount']}, Category: {expense['category']}, Sub-category: {expense['sub_category']}, Date: {expense['date']}, Note: {expense['note']}")
 
 
 def view_expenses_by_date(date):
-    with open(_PATHWAY_EXPENSES_JSON, "r") as file:
-        data = json.load(file)
+    data = list(_EXPENSES.values())
     for expense in data:
         if expense['date'] == date:
             print(f"Amount: {expense['amount']}, Category: {expense['category']}, Sub-category: {expense['sub_category']}, Date: {expense['date']}, Note: {expense['note']}")
@@ -423,16 +416,14 @@ def categories_section():
 
 
 def view_all_categories():
-    with open(_PATHWAY_CATEGORIES_JSON, "r") as file:
-        data = json.load(file)
-    categories = set(category for category in data)
+    data = list(_CATEGORIES.values())
+    categories = set(category['category'] for category in data)
     for category in categories:
         print(category)
 
 
 def check_category_exists(category):
-    with open(_PATHWAY_EXPENSES_JSON, "r") as file:
-        data = json.load(file)
+    data = list(_EXPENSES.values())
     for expense in data:
         if expense['category'] == category:
             return True
