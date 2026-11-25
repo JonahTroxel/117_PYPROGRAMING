@@ -7,6 +7,8 @@ add code to fill out categories.json(totals, number of expenses, last updated, t
 make sure outputs look nice
 reorder the values to match the find_expense
 add remove_budget
+make it so you can manually add an amount to a budget
+make it so you can make it so a budget was created earlier
 check if input field is empty/wrong format when adding expense
 add a date_filed to every expense (this will mess up the usage of print_expense)
 if date field is empty then auto add current date

@@ -1,4 +1,4 @@
-_EXPENSES = {
+all_expenses = {
     "000000001": {
         "id": "000000001", 
         "amount": "50", 

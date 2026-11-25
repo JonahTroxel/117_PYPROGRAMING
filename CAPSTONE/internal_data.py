@@ -1,1 +1,0 @@
-_INTERNAL_DATA = [{"highest_id": 1, "last_date": "2026-10-26"}]
